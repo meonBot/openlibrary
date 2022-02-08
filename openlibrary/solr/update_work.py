@@ -781,11 +781,11 @@ class SolrProcessor:
             elif 'printdisabled' in collections:
                 printdisabled_editions.add(ocaid)
                 printdisabled.add(re_edition_key.match(e['key']).group(1))
-            elif not e.get('access_restricted_item', False):
+            elif e.get('access_restricted_item', False):
+                unclassified_editions.add(ocaid)
+            else:
                 public_scan = True
                 open_editions.add(ocaid)
-            else:
-                unclassified_editions.add(ocaid)
 
             # partners may still rely on these legacy fields, leave logic unchanged
             if not lending_edition and 'lendinglibrary' in e.get('ia_collection', []):
