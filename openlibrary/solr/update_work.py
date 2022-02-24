@@ -49,7 +49,6 @@ re_year = re.compile(r'(\d{4})$')
 
 # This will be set to a data provider; have faith, mypy!
 data_provider = cast(DataProvider, None)
-_ia_db = None
 
 solr_base_url = None
 solr_next: Optional[bool] = None
@@ -1509,9 +1508,8 @@ def update_keys(
             pass
 
     global data_provider
-    global _ia_db
     if data_provider is None:
-        data_provider = get_data_provider('default', _ia_db)
+        data_provider = get_data_provider('default')
 
     wkeys = set()
 
@@ -1663,10 +1661,6 @@ def load_configs(
 
     load_config(c_config)
 
-    global _ia_db
-    if 'ia_db' in config.runtime_config:
-        _ia_db = get_ia_db(config.runtime_config['ia_db'])
-
     global data_provider
     if data_provider is None:
         if isinstance(c_data_provider, DataProvider):
@@ -1674,17 +1668,8 @@ def load_configs(
         elif c_data_provider == 'external':
             data_provider = ExternalDataProvider(host)
         else:
-            data_provider = get_data_provider(c_data_provider, _ia_db)
+            data_provider = get_data_provider(c_data_provider)
     return data_provider
-
-
-def get_ia_db(settings):
-    host = settings['host']
-    db = settings['db']
-    user = settings['user']
-    pw = os.popen(settings['pw_file']).read().strip()
-    ia_db = web.database(dbn="postgres", host=host, db=db, user=user, pw=pw)
-    return ia_db
 
 
 def main(
